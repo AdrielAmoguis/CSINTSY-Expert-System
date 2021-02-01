@@ -10,6 +10,7 @@
 :- dynamic headache/1.
 :- dynamic highTemp/1.
 :- dynamic lowTemp/1.
+:- dynamic feelingCold/1.
 :- dynamic vomiting/1.
 :- dynamic nausea/1.
 :- dynamic feelsWeak/1.
@@ -20,8 +21,6 @@
 :- dynamic chestPain/1.
 :- dynamic cough/1.
 :- dynamic bleeding/1.
-:- dynamic sputum/1.
-:- dynamic secrete/1.
 :- dynamic weakness/1.
 :- dynamic tired/1.
 :- dynamic weightLoss/1.

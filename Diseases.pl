@@ -23,19 +23,19 @@ malaria(P) :-
     malaise(P).
 
 dengue(P) :-
+    fever(P),
+    headache(P),
     nausea(P),
-    vomiting(P),
     rash(P),
-    achesPains(P).
+    achesPains(P),
+    malaise(P).
 
 tuberculosis(P) :-
     chestPain(P),
-    (bloodCough(P); phlegm(P)),
+    bloodCough(P),
+    cough(P), longCough(P), phlegm(P),
     (weakness(P); fatigue(P)),
     weightLoss(P),
-    noAppetite(P),
-    chills(P),
-    fever(P),
     nightSweat(P).
 
 pneumonia(P) :-
@@ -43,9 +43,12 @@ pneumonia(P) :-
     chills(P),
     (cough(P); phlegm(P)),
     shortnessBreath(P),
-    chestPain(P),
-    (nausea(P); vomiting(P)),
-    diarrhea(P).
+    chestPain(P).
+
+bronchitis(P) :-
+    ((cough(P); phlegm(P)),
+    chestPain(P));
+    wheezing(P).
 
 mildHypertension(P) :-
     morningHeadache(P),
@@ -69,3 +72,14 @@ diarrhea(P) :-
     looseStools(P),
     abdominalPain(P),
     dehydration(P).
+
+cholera(P) :-
+    diarrhea(P),
+    profuseLooseStools(P),
+    fasterDehydration(P).
+
+flu(P) :-
+    fever(P),
+    cough(P),
+    cold(P),
+    runnyNose(P).

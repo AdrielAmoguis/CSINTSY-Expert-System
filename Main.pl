@@ -46,6 +46,7 @@ enQuestionnaire(PatientName) :-
     write("Have you been having high temperatures? [Y/N] : "), read(HasHighTemp), (((HasHighTemp = 'y' ; HasHighTemp = 'Y') -> assert(highTemp(PatientName))) ; true),
     write("Have you been having low temperatures? [Y/N] : "), read(HasLowTemp), (((HasLowTemp = 'y' ; HasLowTemp = 'Y') -> assert(lowTemp(PatientName))) ; true),
     write("Have you been feeling cold? [Y/N] : "), read(Cold), (((Cold = 'y' ; Cold = 'Y') -> assert(feelingCold(PatientName))) ; true),
+    write("Have you been having a runny nose? [Y/N] : "), read(RunnyNose), (((RunnyNose = 'y' ; RunnyNose = 'Y') -> assert(runnyNose(PatientName))) ; true),
     write("Have you been vomiting? [Y/N] : "), read(BeenVomiting), (((BeenVomiting = 'y' ; BeenVomiting = 'Y') -> assert(vomiting(PatientName))) ; true),
     write("Have you been nauseous lately? [Y/N] : "), read(BeenNauseous), (((BeenNauseous = 'y' ; BeenNauseous = 'Y') -> assert(nausea(PatientName))) ; true),
     write("Have you been feeling weak lately? [Y/N] : "), read(FeelingWeak), (((FeelingWeak = 'y' ; FeelingWeak = 'Y') -> assert(feelsWeak(PatientName))) ; true),
@@ -55,6 +56,7 @@ enQuestionnaire(PatientName) :-
     write("Have you been having sore muscles? [Y/N] : "), read(HasSoreMuscles), (((HasSoreMuscles = 'y' ; HasSoreMuscles = 'Y') -> assert(soreMuscles(PatientName))) ; true),
     write("Have you been having chest pain? [Y/N] : "), read(HasChestPain), (((HasChestPain = 'y' ; HasChestPain = 'Y') -> assert(chestPain(PatientName))) ; true),
     write("Have you been coughing lately? [Y/N] : "), read(HasCough), (((HasCough = 'y' ; HasCough = 'Y') -> assert(cough(PatientName))) ; true),
+    write("Have you been coughing for 2 weeks? [Y/N] : "), read(HasLongCough), (((HasLongCough = 'y' ; HasLongCough = 'Y') -> assert(longCough(PatientName))) ; true),
     write("Have you been bleeding in any way lately (even bleeding phlegm)? [Y/N] : "), read(IsBleeding), (((IsBleeding = 'y' ; IsBleeding = 'Y') -> assert(bleeding(PatientName))) ; true),
     write("Have you been having phlegm lately? [Y/N] : "), read(HasSputum), (((HasSputum = 'y' ; HasSputum = 'Y') -> assert(phlegm(PatientName))) ; true),
     write("Have you been constantly weak lately ? [Y/N] : "), read(IsWeak), (((IsWeak = 'y' ; IsWeak = 'Y') -> assert(weakness(PatientName))) ; true),
@@ -73,6 +75,7 @@ enQuestionnaire(PatientName) :-
     write("Have you been wheezing hard lately? [Y/N] : "), read(Wheezing), (((Wheezing = 'y' ; Wheezing = 'Y') -> assert(wheezing(PatientName))) ; true),
     write("Have you been having a midly warm body temperature lately? [Y/N] : "), read(MildWarm), (((MildWarm = 'y' ; MildWarm = 'Y') -> assert(mildTemperature(PatientName))) ; true),
     write("Have you been having a loose bowel movement lately? [Y/N] : "), read(LBM), (((LBM = 'y' ; LBM = 'Y') -> assert(looseStools(PatientName))) ; true),
+    write("Do you have severe loose bowel movement? [Y/N] : "), read(SLBM), (((SLBM = 'y' ; SLBM = 'Y') -> assert(fasterStools(PatientName))) ; true),
     write("Have you been having abdominal pain lately? [Y/N] : "), read(AbdomenPain), (((AbdomenPain = 'y' ; AbdomenPain = 'Y') -> assert(abdominalPain(PatientName))) ; true),
     write("Have you been having a lack of fluid intake lately? [Y/N] : "), read(BadHydro), (((BadHydro = 'y' ; BadHydro = 'Y') -> assert(noHydration(PatientName))) ; true),
 

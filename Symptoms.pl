@@ -11,6 +11,7 @@
 :- dynamic highTemp/1.
 :- dynamic lowTemp/1.
 :- dynamic feelingCold/1.
+:- dynamic runnyNose/1.
 :- dynamic vomiting/1.
 :- dynamic nausea/1.
 :- dynamic feelsWeak/1.
@@ -20,6 +21,7 @@
 :- dynamic soreMuscles/1.
 :- dynamic chestPain/1.
 :- dynamic cough/1.
+:- dynamic longCough/1.
 :- dynamic bleeding/1.
 :- dynamic weakness/1.
 :- dynamic tired/1.
@@ -38,6 +40,7 @@
 :- dynamic wheezing/1.
 :- dynamic mildTemperature/1.
 :- dynamic looseStools/1.
+:- dynamic fasterStools/1.
 :- dynamic abdominalPain/1.
 :- dynamic noHydration/1.
 
@@ -47,6 +50,9 @@
 fever(P) :-
     highTemp(P),
     headache(P).
+
+cold(P) :-
+    runnyNose(P).
 
 chills(P) :-
     feelingCold(P).
@@ -91,3 +97,11 @@ lowFever(P) :-
 dehydration(P) :-
     pale(P),
     noHydration(P).
+
+profuseLooseStools(P) :-
+    looseStools(P),
+    fasterStools(P).
+
+fasterDehydration(P) :-
+    profuseLooseStools(P),
+    dehydration(P).

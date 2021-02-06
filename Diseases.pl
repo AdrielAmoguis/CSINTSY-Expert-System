@@ -24,31 +24,32 @@ malaria(P) :-
 
 dengue(P) :-
     fever(P),
-    headache(P),
+    headache(P), % follow-up; retro-orbital
     nausea(P),
     rash(P),
     achesPains(P),
     malaise(P).
 
 tuberculosis(P) :-
+    fever(P),
     chestPain(P),
     bloodCough(P),
     cough(P), longCough(P), phlegm(P),
     (weakness(P); fatigue(P)),
     weightLoss(P),
-    nightSweat(P).
+    nightSweat(P). % Back pain
 
 pneumonia(P) :-
     fever(P),
     chills(P),
     (cough(P); phlegm(P)),
-    shortnessBreath(P),
+    shortnessBreath(P), % OR
     chestPain(P).
 
 bronchitis(P) :-
     ((cough(P); phlegm(P)),
     chestPain(P));
-    wheezing(P).
+    wheezing(P). % ADD OR - shortnessBreath
 
 mildHypertension(P) :-
     morningHeadache(P),
@@ -68,7 +69,7 @@ severeHypertension(P) :-
     shortnessBreath(P),
     lowFever(P).
 
-diarrhea(P) :-
+diarrhea(P) :- % Gastroenteritis
     looseStools(P),
     abdominalPain(P),
     dehydration(P).

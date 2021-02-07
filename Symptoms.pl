@@ -11,6 +11,7 @@
 % NEW
 % PHYSICAL
 :- dynamic temperature/2.
+:- dynamic bloodPressure/3.
 :- dynamic pale/1.
 :- dynamic redSpots/1.
 :- dynamic badPulse/1.
@@ -31,16 +32,24 @@
 :- dynamic looseStools/1.
 :- dynamic abdominalPain/1.
 :- dynamic noHydration/1.
+:- dynamic increasedUrine/1.
+:- dynamic increasedThirst/1.
+:- dynamic weightLoss/1.
 
 % Follow-Up
 :- dynamic longCough/1.
 :- dynamic wheezing/1.
 :- dynamic bloodyCough/1.
 :- dynamic fasterStools/1.
+:- dynamic diabetesFamily/1.
 
 
 % PREDICATES
 % P - patient
+
+highBP(P) :-
+    bloodPressure(P, Diastolic, Systolic),
+    Diastolic > 89, Systolic > 120.
 
 highTemp(P) :-
     temperature(P, Temp),

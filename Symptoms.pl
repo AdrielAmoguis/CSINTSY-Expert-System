@@ -9,9 +9,11 @@
 % DYNAMIC FACTS
 
 % NEW
-% PHYSICAL
+% HPI Questions
 :- dynamic temperature/2.
 :- dynamic bloodPressure/3.
+
+% PHYSICAL
 :- dynamic pale/1.
 :- dynamic redSpots/1.
 :- dynamic badPulse/1.
@@ -42,6 +44,7 @@
 :- dynamic bloodyCough/1.
 :- dynamic fasterStools/1.
 :- dynamic diabetesFamily/1.
+:- dynamic malariaRiskArea/1.
 
 
 % PREDICATES

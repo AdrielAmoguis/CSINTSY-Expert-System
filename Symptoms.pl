@@ -70,8 +70,7 @@ mildTemperature(P) :-
     (Temp < 37.5).
 
 fever(P) :-
-    highTemp(P),
-    headache(P).
+    highTemp(P).
 
 cold(P) :-
     runnyNose(P).

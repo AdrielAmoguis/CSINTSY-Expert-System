@@ -31,7 +31,7 @@ flu(P, C) :-
     L = [],
     ((fever(P) -> append([50], L, L1); not(fever(P)) -> append([], L, L1)) ; true),
     ((cough(P) -> append([10], L1, L2); not(cough(P)) -> append([], L1, L2)) ; true),
-    ((colds(P) -> append([20], L2, L3); not(colds(P)) -> append([], L2, L3)) ; true),
+    ((cold(P) -> append([20], L2, L3); not(cold(P)) -> append([], L2, L3)) ; true),
     ((runnyNose(P) -> append([20], L3, L4); not(runnyNose(P)) -> append([], L3, L4)) ; true),
 
     % Calculate & Return the Certainty Factor
@@ -75,7 +75,7 @@ bronchitis(P, C) :-
     L = [],
     ((cough(P) -> append([50], L, L1); not(cough(P)) -> append([], L, L1)) ; true),
     ((chestPain(P) -> append([10], L1, L2); not(chestPain(P)) -> append([], L1, L2)) ; true),
-    ((wheezing(P) -> append([35], L2, L3); not(wheezing(P)) -> append([], L2, L3)) ; true),
+    ((wheezing(P) -> append([40], L2, L3); not(wheezing(P)) -> append([], L2, L3)) ; true),
 
     % Calculate & Return the Certainty Factor
     listSum(L3, C).

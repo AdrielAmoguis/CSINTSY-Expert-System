@@ -255,3 +255,8 @@ gastroQuestionnaire(P) :-
 
     % Must have looseStools
     looseStools(P).
+
+    /* Gastro diseases are too similar. Will ask for more symptoms. */
+
+/* Questions for Lifestyle Diseases */
+lifestyleQuestionnaire(P).

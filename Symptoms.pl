@@ -12,6 +12,8 @@
 % HPI Questions
 :- dynamic temperature/2.
 :- dynamic bloodPressure/3.
+:- dynamic height/2.
+:- dynamic weight/2.
 
 % PHYSICAL
 :- dynamic pale/1.

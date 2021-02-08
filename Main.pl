@@ -36,7 +36,10 @@ diagnose(PatientName) :-
     nl, nl, nl,
 
     % Get the HPI
-    getHPI(PatientName).
+    getHPI(PatientName),
+    
+    % Launch the Questionnaire
+    mainQuestionnaire(PatientName).
 
 /* Get the Patient's HPI */
 getHPI(P) :-
@@ -52,4 +55,13 @@ getHPI(P) :-
     write("Please enter your systolic blood pressure (in mmHg) : "), read(SysBP),
     assert(bloodPressure(P, DiasBP, SysBP)),
 
-    
+    % Height
+    write("Please enter your height (in centimeters) : "), read(Height),
+    assert(height(P, Height)),
+
+    % Weight
+    write("Please enter your weight (in kilograms) : "), read(Weight),
+    assert(weight(P, Weight)).
+
+/* Main Questionnaire */
+mainQuestionnaire(P) :-

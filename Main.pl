@@ -44,8 +44,11 @@ diagnose(PatientName) :-
     % Get the HPI
     getHPI(PatientName),
     
-    % Get the Chief Complaint
-    (chiefComplaint(PatientName); true).
+    % Get the Chief Complaint and Diagnose
+    (chiefComplaint(PatientName); true),
+
+    % Parse Results
+    diagnosedSummary(PatientName).
 
 /* Get the Patient's HPI */
 getHPI(P) :-
@@ -105,6 +108,13 @@ chiefComplaint(P) :-
     not(diagnosed(P)),
 
     % GASTRO
+    (gastroQuestionnaire(P) ; true),
+
+    % Check if the patient is already diagnosed
+    not(diagnosed(P)),
+
+    % LIFESTYLE
+    lifestyleQuestionnaire(P).
 
 
 /* Questions for Viral Diseases */
@@ -118,7 +128,7 @@ viralQuestionnaire(P) :-
     ((BM = 'y' ; BM = 'Y') -> assert(malaise(P)) ; true),
 
     % Runny Nose / Colds
-    write("Do you a colds or a runny nose? [Y/N] : "), read(RN),
+    write("Do you have colds or a runny nose? [Y/N] : "), read(RN),
     ((RN = 'y' ; RN = 'Y') -> assert(runnyNose(P)) ; true),
 
     % Test for Malaria (if there is body malaise)
@@ -147,8 +157,8 @@ viralQuestionnaire(P) :-
     % Test for Dengue (if there is body malaise)
     (malaise(P) -> (
 
-        write("Are you having frequent headaches? [Y/N] : "), read(HA),
-        ((HA = 'Y' ; HA = 'y') -> assert(headache(P)) ; true),
+        (not(cough(P)) -> (write("Are you having frequent headaches? [Y/N] : "), read(HA),
+        ((HA = 'Y' ; HA = 'y') -> assert(headache(P)) ; true)); true),
 
         write("Are you having rashes? [Y/N] : "), read(Rash),
         ((Rash = 'Y' ; Rash = 'y') -> assert(rash(P)) ; true),
@@ -178,7 +188,8 @@ viralQuestionnaire(P) :-
     % Check if any certainties are over 75
     ((FluCertainty >= 75) -> assert(diagnosed(P)), assert(diagnosis(P, "Flu", FluCertainty)) ; true),
     ((DengueCertainty >= 75) -> assert(diagnosed(P)), assert(diagnosis(P, "Dengue", DengueCertainty)) ; true),
-    ((MalariaCertainty >= 75) -> assert(diagnosed(P)), assert(diagnosis(P, "Malaria", MalariaCertainty)) ; true).
+    ((MalariaCertainty >= 75) -> assert(diagnosed(P)), assert(diagnosis(P, "Malaria", MalariaCertainty)) ; true),
+    !.
 
 /* Questions for Respiratory Diseases */
 respiratoryQuestionnaire(P) :-
@@ -234,7 +245,7 @@ respiratoryQuestionnaire(P) :-
     ((Wheeze = 'Y' ; Wheeze = 'y') -> assert(wheezing(P)) ; true),
 
     % Get Bronchitis Certainty
-    (bronchitis(P, BronchitisCertainty) ; true),
+    (wheezing(P) -> (bronchitis(P, BronchitisCertainty) ; true)),
 
     % Set certainty to 0 if not wheezing
     (not(wheezing(P)) -> BronchitisCertainty is 0 ; true),
@@ -254,9 +265,130 @@ gastroQuestionnaire(P) :-
     ((LBM = 'y' ; LBM = 'Y') -> assert(looseStools(P)) ; true),
 
     % Must have looseStools
-    looseStools(P).
+    looseStools(P),
 
-    /* Gastro diseases are too similar. Will ask for more symptoms. */
+    % Check for diarrhea
+    
+    % Check for Abdominal Pain
+    write("Are you experiencing abdominal pain? [Y/N] : "), read(AwitTiyan),
+    ((AwitTiyan = 'y' ; AwitTiyan = 'Y') -> assert(abdominalPain(P)) ; true),
+
+    % Check for Dehydration
+    write("Are you dehydrated? [Y/N] : "), read(Dehyd),
+    ((Dehyd = 'y' ; Dehyd = 'Y') -> assert(dehydration(P)) ; true),
+
+    % Get Diarrhea Certainty
+    diarrhea(P, DiarrheaCertainty),
+
+    % Check for Cholera only if there is diarrhea
+    ((diarrhea(P, DCer), DCer >= 75) -> (
+
+        % Check for more profuse bowel movement
+        write("Is your bowel movement really severe (totally liquid)? [Y/N] : "), read(AwitAwitTiyan),
+        ((AwitAwitTiyan = 'y' ; AwitAwitTiyan = 'Y') -> assert(fasterStools(P)) ; true),
+
+        % Check for more profuse dehydration
+        write("Is your dehydration severe? [Y/N] : "), read(AwitDehydration),
+        ((AwitDehydration = 'y' ; AwitDehydration = 'Y') -> assert(fasterDehydration(P)) ; true),
+
+        % Get cholera certainty
+        cholera(P, CholeraCertainty)
+
+    ) ; true),
+
+    (not(diarrhea(P, DCCer), DCCer >= 75) -> CholeraCertainty is 0 ; true),
+
+    % Check if any certainties are over 75
+    ((DiarrheaCertainty >= 75) -> assert(diagnosed(P)), assert(diagnosis(P, "Diarrhea", DiarrheaCertainty)) ; true),
+    ((CholeraCertainty >= 75) -> assert(diagnosed(P)), assert(diagnosis(P, "Cholera", CholeraCertainty)) ; true).
 
 /* Questions for Lifestyle Diseases */
-lifestyleQuestionnaire(P).
+lifestyleQuestionnaire(P) :-
+
+    % HYPERTENSION - Patient must have elevated blood pressure
+    (highBP(P) -> (
+
+        % Check for Headache
+        write("Are you experiencing headaches? [Y/N] : "), read(SakitUlo),
+        ((SakitUlo = 'y' ; SakitUlo = 'Y') -> assert(headache(P)) ; true),
+
+        % Vision Changes
+        write("Are you experiencing vision changes? [Y/N] : "), read(IbaPagtingin),
+        ((IbaPagtingin = 'y' ; IbaPagtingin = 'Y') -> assert(visionChanges(P)) ; true),
+
+        % Get Hypertension Certainty
+        hypertension(P, HypertensionCertainty)
+
+    ) ; true),
+
+    (not(highBP(P)) -> HypertensionCertainty is 0 ; true),
+
+    % DIABETES - Check for all symptoms
+
+    % Check for Increased Urination
+    write("Are you experiencing increased urination? [Y/N] : "), read(DamingIhi),
+    ((DamingIhi = 'y' ; DamingIhi = 'Y') -> assert(increasedUrine(P)) ; true),
+
+    % Check for Increased Thirst
+    write("Are you experiencing increased thirst? [Y/N] : "), read(Uhaw),
+    ((Uhaw = 'y' ; Uhaw = 'Y') -> assert(increasedThirst(P)) ; true),
+
+    % Check for Weight Loss
+    write("Have you been losing weight lately? [Y/N] : "), read(GettingLighter),
+    ((GettingLighter = 'y' ; GettingLighter = 'Y') -> assert(weightLoss(P)) ; true),
+
+    % Check for Family History
+    write("Do you have family history of Diabetes? [Y/N] : "), read(FamHistoryDiabetes),
+    ((FamHistoryDiabetes = 'y' ; FamHistoryDiabetes = 'Y') -> assert(diabetesFamily(P)) ; true),
+
+    % Get Diabetes Certainty
+    (diabetes(P, DiabetesCertainty) ; true),
+
+    % Check for any symptoms above 75%
+    ((HypertensionCertainty >= 75) -> assert(diagnosed(P)), assert(diagnosis(P, "Hypertension", HypertensionCertainty)) ; true),
+    ((DiabetesCertainty >= 75) -> assert(diagnosed(P)), assert(diagnosis(P, "Diabetes", DiabetesCertainty)) ; true).
+
+/* Get the Patient's Diagnosis Summary */
+diagnosedSummary(P) :-
+
+    %  EMERGENCY
+    (emergency(P) -> (
+
+        write("Emergency\n")
+
+    ) ; true),
+
+    % NON-EMERGENCY
+    (not(emergency(P)) -> (
+
+        % Display all the listed diagnosis
+        getDiagnosis(P, Diseases),
+
+        write_ln("Here are our findings:"),
+        printList(Diseases)
+
+    ) ; true).
+
+/* UTILITY PREDICATES */
+
+% Get getDiagnosis
+getDiagnosis(P, [Disease | Rest]) :-
+
+    % Retract diagnosis
+    ((retract(diagnosed(P)), retract(diagnosis(P, D, C))) -> (
+
+        % Parse this disease
+        Disease = [D,C],
+
+        % Retract Further
+        getDiagnosis(P, Rest)
+    ) ; true),
+
+    % No more diagnosis, return an empty list
+    Disease = [], Rest = [].
+
+% Print a list
+printList([]).
+printList([Head | Tail]) :-
+    write_ln(Head),
+    printList(Tail).

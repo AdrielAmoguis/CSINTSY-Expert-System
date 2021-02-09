@@ -21,8 +21,10 @@
 :- dynamic badPulse/1.
 
 % COMPLAINTS
+:- dynamic malaise/1.
 :- dynamic headache/1.
 :- dynamic runnyNose/1.
+:- dynamic cold/1.
 :- dynamic feelingCold/1.
 :- dynamic feelsWeak/1.
 :- dynamic vomiting/1.
@@ -72,36 +74,12 @@ mildTemperature(P) :-
 fever(P) :-
     highTemp(P).
 
-cold(P) :-
-    runnyNose(P).
-
-chills(P) :-
-    feelingCold(P).
-
-malaise(P) :-
-    feelsWeak(P).
-
-rash(P) :-
-    redSpots(P).
-
 bloodCough(P) :-
     cough(P),
     bloodyCough(P).
 
-fatigue(P) :-
-    weakness(P),
-    tired(P).
-
 visionChanges(P) :-
     blurryVision(P).
-
-lowFever(P) :-
-    headache(P),
-    mildTemperature(P).
-
-dehydration(P) :-
-    pale(P),
-    noHydration(P).
 
 profuseLooseStools(P) :-
     looseStools(P),

@@ -93,13 +93,12 @@ diarrhea(P, C) :-
 % Cholera
 cholera(P, C) :-
     L = [],
-    ((looseStools(P) -> append([25], L, L1); not(looseStools(P)) -> append([], L, L1)) ; true),
-    ((fasterStools(P) -> append([25], L1, L2); not(fasterStools(P)) -> append([], L1, L2)) ; true),
-    ((dehydration(P) -> append([25], L2, L3); not(dehydration(P)) -> append([], L2, L3)) ; true),
-    ((fasterDehydration(P) -> append([25], L3, L4); not(fasterDehydration(P)) -> append([], L3, L4)) ; true),
+    (((diarrhea(P, DC), DC >= 75)-> append([33.3333], L, L1); not(diarrhea(P, DDC), DDC >= 75) -> append([], L, L1)) ; true),
+    ((fasterStools(P) -> append([33.3333], L1, L2); not(fasterStools(P)) -> append([], L1, L2)) ; true),
+    ((fasterDehydration(P) -> append([33.3333], L2, L3); not(fasterDehydration(P)) -> append([], L2, L3)) ; true),
 
     % Calculate & Return the Certainty Factor
-    listSum(L4, C).
+    listSum(L3, C).
 
 % Hypertension
 hypertension(P, C) :-
@@ -125,7 +124,7 @@ diabetes(P, C) :-
 /* UTILITY PREDICATES */
 
 % This predicate gets the sum of all elements of a number list.
-listSum([], 0).
+listSum([X], X).
 listSum([E|L], Sum) :-
     listSum(L, S),
     Sum is S + E.

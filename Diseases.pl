@@ -106,9 +106,10 @@ hypertension(P, C) :-
     ((highBP(P) -> append([70], L, L1); not(highBP(P)) -> append([], L, L1)) ; true), !,
     ((headache(P) -> append([20], L1, L2); not(headache(P)) -> append([], L1, L2)) ; true), !,
     ((visionChanges(P) -> append([10], L2, L3); not(visionChanges(P)) -> append([], L2, L3)) ; true), !,
+    ((obese(P) -> append([10], L3, L4); not(obese(P)) -> append([], L3, L4)) ; true), !,
 
     % Calculate & Return the Certainty Factor
-    listSum(L3, C).
+    listSum(L4, C).
 
 % Diabetes
 diabetes(P, C) :-

@@ -79,3 +79,16 @@ fever(P) :-
 
 visionChanges(P) :-
     blurryVision(P).
+
+obese(P) :-
+    getBMI(P, BMI),
+    BMI >= 30.
+
+getBMI(P, BMI) :-
+    height(P, Height),
+    weight(P, Weight),
+
+    % Convert height to meters squared
+    mHeight is div(Height, 100),
+    msHeight is mHeight**2,
+    BMI is div(Weight, msHeight).

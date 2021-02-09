@@ -25,6 +25,8 @@
 :- dynamic headache/1.
 :- dynamic runnyNose/1.
 :- dynamic cold/1.
+:- dynamic rash/1.
+:- dynamic chills/1.
 :- dynamic feelingCold/1.
 :- dynamic feelsWeak/1.
 :- dynamic vomiting/1.
@@ -45,8 +47,9 @@
 % Follow-Up
 :- dynamic longCough/1.
 :- dynamic wheezing/1.
-:- dynamic bloodyCough/1.
+:- dynamic bloodCough/1.
 :- dynamic fasterStools/1.
+:- dynamic fasterDehydration/1.
 :- dynamic diabetesFamily/1.
 :- dynamic malariaRiskArea/1.
 
@@ -74,17 +77,5 @@ mildTemperature(P) :-
 fever(P) :-
     highTemp(P).
 
-bloodCough(P) :-
-    cough(P),
-    bloodyCough(P).
-
 visionChanges(P) :-
     blurryVision(P).
-
-profuseLooseStools(P) :-
-    looseStools(P),
-    fasterStools(P).
-
-fasterDehydration(P) :-
-    profuseLooseStools(P),
-    dehydration(P).

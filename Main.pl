@@ -45,7 +45,7 @@ diagnose(PatientName) :-
     getHPI(PatientName),
     
     % Get the Chief Complaint and Diagnose
-    (chiefComplaint(PatientName); true),
+    (chiefComplaint(PatientName) ; true), !,
 
     % Parse Results
     diagnosedSummary(PatientName).
@@ -96,25 +96,25 @@ chiefComplaint(P) :-
     %   - Weight Loss
 
     % VIRAL
-    (viralQuestionnaire(P) ; true),
+    (viralQuestionnaire(P) ; true), !,
 
     % Check if the patient is already diagnosed
-    not(diagnosed(P)),
+    not(diagnosis(P, _, _)),
 
     % RESPIRATORY
-    (respiratoryQuestionnaire(P) ; true),
+    (respiratoryQuestionnaire(P) ; true), !,
 
     % Check if the patient is already diagnosed
-    not(diagnosed(P)),
+    not(diagnosis(P, _, _)),
 
     % GASTRO
-    (gastroQuestionnaire(P) ; true),
+    (gastroQuestionnaire(P) ; true), !,
 
     % Check if the patient is already diagnosed
-    not(diagnosed(P)),
+    not(diagnosis(P, _, _)),
 
     % LIFESTYLE
-    lifestyleQuestionnaire(P).
+    lifestyleQuestionnaire(P), !.
 
 
 /* Questions for Viral Diseases */
@@ -128,8 +128,11 @@ viralQuestionnaire(P) :-
     ((BM = 'y' ; BM = 'Y') -> assert(malaise(P)) ; true),
 
     % Runny Nose / Colds
-    write("Do you have colds or a runny nose? [Y/N] : "), read(RN),
+    write("Do you have a runny nose? [Y/N] : "), read(RN),
     ((RN = 'y' ; RN = 'Y') -> assert(runnyNose(P)) ; true),
+
+    write("Do you have colds? [Y/N] : "), read(Lamig),
+    ((Lamig = 'y' ; Lamig = 'Y') -> assert(cold(P)) ; true),
 
     % Test for Malaria (if there is body malaise)
     (malaise(P) -> (
@@ -150,21 +153,21 @@ viralQuestionnaire(P) :-
         ((RiskArea = 'Y' ; RiskArea = 'y') -> assert(malariaRiskArea(P)) ; true),
 
         % Get Malaria Certainty
-        malaria(P, MalariaCertainty)
+        (malaria(P, MalariaCertainty))
 
     ) ; true),
 
     % Test for Dengue (if there is body malaise)
     (malaise(P) -> (
 
-        (not(cough(P)) -> (write("Are you having frequent headaches? [Y/N] : "), read(HA),
-        ((HA = 'Y' ; HA = 'y') -> assert(headache(P)) ; true)); true),
+        (not(headache(P)) -> (write("Are you having frequent headaches? [Y/N] : "), read(HAA),
+        ((HAA = 'Y' ; HAA = 'y') -> assert(headache(P)) ; true)); true),
 
         write("Are you having rashes? [Y/N] : "), read(Rash),
         ((Rash = 'Y' ; Rash = 'y') -> assert(rash(P)) ; true),
 
         % Get Dengue Certainty
-        dengue(P, DengueCertainty)
+        (dengue(P, DengueCertainty))
 
     ) ; true),
 
@@ -174,22 +177,21 @@ viralQuestionnaire(P) :-
     % Test for Flu (if there is colds/runnynose)
     (runnyNose(P) -> (
 
-        write("Are you having cough? [Y/N] : "), read(Cough),
-        ((Cough = 'Y' ; Cough = 'y') -> assert(cough(P)) ; true),
+        (not(cough(P)) -> (write("Are you having cough? [Y/N] : "), read(Cough),
+        ((Cough = 'Y' ; Cough = 'y') -> assert(cough(P))) ; true); true),
 
         % Get Flu Certainty
-        flu(P, FluCertainty)
+        (flu(P, FluCertainty))
 
     ) ; true),
-
+    
     % If there is no runny nose, declare certainty to 0
     (not(runnyNose(P)) -> FluCertainty is 0 ; true),
 
     % Check if any certainties are over 75
-    ((FluCertainty >= 75) -> assert(diagnosed(P)), assert(diagnosis(P, "Flu", FluCertainty)) ; true),
-    ((DengueCertainty >= 75) -> assert(diagnosed(P)), assert(diagnosis(P, "Dengue", DengueCertainty)) ; true),
-    ((MalariaCertainty >= 75) -> assert(diagnosed(P)), assert(diagnosis(P, "Malaria", MalariaCertainty)) ; true),
-    !.
+    ((FluCertainty >= 75) -> assert(diagnosis(P, "Flu", FluCertainty)) ; true), !,
+    ((DengueCertainty >= 75) -> assert(diagnosis(P, "Dengue", DengueCertainty)) ; true), !,
+    ((MalariaCertainty >= 75) -> assert(diagnosis(P, "Malaria", MalariaCertainty)) ; true), !.
 
 /* Questions for Respiratory Diseases */
 respiratoryQuestionnaire(P) :-
@@ -218,7 +220,7 @@ respiratoryQuestionnaire(P) :-
         write("Do you cough up blood? [Y/N] : "), read(UboDugo),
         ((UboDugo = 'Y' ; UboDugo = 'y') -> assert(bloodCough(P)) ; true),
 
-        % Get Dengue Certainty
+        % Get TB Certainty
         tuberculosis(P, TBCertainty)
 
     ) ; true),
@@ -251,9 +253,9 @@ respiratoryQuestionnaire(P) :-
     (not(wheezing(P)) -> BronchitisCertainty is 0 ; true),
 
     % Check if any certainties are over 75
-    ((TBCertainty >= 75) -> assert(diagnosed(P)), assert(diagnosis(P, "Tuberculosis", TBCertainty)) ; true),
-    ((PneuCertainty >= 75) -> assert(diagnosed(P)), assert(diagnosis(P, "Pneumonia", PneuCertainty)) ; true),
-    ((BronchitisCertainty >= 75) -> assert(diagnosed(P)), assert(diagnosis(P, "Bronchitis", BronchitisCertainty)) ; true).
+    ((TBCertainty >= 75) -> assert(diagnosis(P, "Tuberculosis", TBCertainty)) ; true), !,
+    ((PneuCertainty >= 75) -> assert(diagnosis(P, "Pneumonia", PneuCertainty)) ; true), !,
+    ((BronchitisCertainty >= 75) -> assert(diagnosis(P, "Bronchitis", BronchitisCertainty)) ; true), !.
 
 /* Questions for Gastrointestinal Diseases */
 gastroQuestionnaire(P) :-
@@ -299,8 +301,8 @@ gastroQuestionnaire(P) :-
     (not(diarrhea(P, DCCer), DCCer >= 75) -> CholeraCertainty is 0 ; true),
 
     % Check if any certainties are over 75
-    ((DiarrheaCertainty >= 75) -> assert(diagnosed(P)), assert(diagnosis(P, "Diarrhea", DiarrheaCertainty)) ; true),
-    ((CholeraCertainty >= 75) -> assert(diagnosed(P)), assert(diagnosis(P, "Cholera", CholeraCertainty)) ; true).
+    ((DiarrheaCertainty >= 75) -> assert(diagnosis(P, "Diarrhea", DiarrheaCertainty)) ; true), !,
+    ((CholeraCertainty >= 75) -> assert(diagnosis(P, "Cholera", CholeraCertainty)) ; true), !.
 
 /* Questions for Lifestyle Diseases */
 lifestyleQuestionnaire(P) :-
@@ -362,33 +364,17 @@ diagnosedSummary(P) :-
     (not(emergency(P)) -> (
 
         % Display all the listed diagnosis
-        getDiagnosis(P, Diseases),
 
         write_ln("Here are our findings:"),
-        printList(Diseases)
+
+        (getDiagnosis(P); true), !,
 
     ) ; true).
 
 /* UTILITY PREDICATES */
 
-% Get getDiagnosis
-getDiagnosis(P, [Disease | Rest]) :-
-
-    % Retract diagnosis
-    ((retract(diagnosed(P)), retract(diagnosis(P, D, C))) -> (
-
-        % Parse this disease
-        Disease = [D,C],
-
-        % Retract Further
-        getDiagnosis(P, Rest)
-    ) ; true),
-
-    % No more diagnosis, return an empty list
-    Disease = [], Rest = [].
-
-% Print a list
-printList([]).
-printList([Head | Tail]) :-
-    write_ln(Head),
-    printList(Tail).
+% Print Diagnosis
+getDiagnosis(P) :- 
+    retract(diagnosis(P, D, C)),
+    format("| ~w~20t | ~w~20t |~n", [D,C]),
+    getDiagnosis(P).

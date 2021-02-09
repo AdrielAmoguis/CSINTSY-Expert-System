@@ -186,12 +186,21 @@ viralQuestionnaire(P) :-
     ) ; true),
     
     % If there is no runny nose, declare certainty to 0
-    (not(runnyNose(P)) -> FluCertainty is 0 ; true),
+    (not(runnyNose(P)) -> FluCertainty is 0 ; true), !,
 
-    % Check if any certainties are over 75
-    ((FluCertainty >= 75) -> assert(diagnosis(P, "Flu", FluCertainty)) ; true), !,
-    ((DengueCertainty >= 75) -> assert(diagnosis(P, "Dengue", DengueCertainty)) ; true), !,
-    ((MalariaCertainty >= 75) -> assert(diagnosis(P, "Malaria", MalariaCertainty)) ; true), !.
+    % Check if any certainties are over 75, if not emergency
+    (not(emergency(P)) -> (
+        ((FluCertainty >= 75) -> assert(diagnosis(P, "Flu", FluCertainty)) ; true), !,
+        ((DengueCertainty >= 75) -> assert(diagnosis(P, "Dengue", DengueCertainty)) ; true), !,
+        ((MalariaCertainty >= 75) -> assert(diagnosis(P, "Malaria", MalariaCertainty)) ; true), !
+    ); true), !,
+
+    % If emergency, store diagnosis anyway
+    ((emergency(P) -> (
+        assert(diagnosis(P, "Flu", FluCertainty)),
+        assert(diagnosis(P, "Dengue", DengueCertainty)),
+        assert(diagnosis(P, "Malaria", MalariaCertainty))
+    )); true), !.
 
 /* Questions for Respiratory Diseases */
 respiratoryQuestionnaire(P) :-
@@ -252,10 +261,19 @@ respiratoryQuestionnaire(P) :-
     % Set certainty to 0 if not wheezing
     (not(wheezing(P)) -> BronchitisCertainty is 0 ; true),
 
-    % Check if any certainties are over 75
-    ((TBCertainty >= 75) -> assert(diagnosis(P, "Tuberculosis", TBCertainty)) ; true), !,
-    ((PneuCertainty >= 75) -> assert(diagnosis(P, "Pneumonia", PneuCertainty)) ; true), !,
-    ((BronchitisCertainty >= 75) -> assert(diagnosis(P, "Bronchitis", BronchitisCertainty)) ; true), !.
+    % Check if any certainties are over 75, if not emergency
+    (not(emergency(P)) -> (
+        ((TBCertainty >= 75) -> assert(diagnosis(P, "Tuberculosis", TBCertainty)) ; true), !,
+        ((PneuCertainty >= 75) -> assert(diagnosis(P, "Pneumonia", PneuCertainty)) ; true), !,
+        ((BronchitisCertainty >= 75) -> assert(diagnosis(P, "Bronchitis", BronchitisCertainty)) ; true), !
+    ); true), !,
+
+    % If emergency, store diagnosis anyway
+    ((emergency(P) -> (
+        assert(diagnosis(P, "Flu", TBCertainty)),
+        assert(diagnosis(P, "Pneumonia", PneuCertainty)),
+        assert(diagnosis(P, "Bronchitis", BronchitisCertainty))
+    )); true), !.
 
 /* Questions for Gastrointestinal Diseases */
 gastroQuestionnaire(P) :-
@@ -300,9 +318,17 @@ gastroQuestionnaire(P) :-
 
     (not(diarrhea(P, DCCer), DCCer >= 75) -> CholeraCertainty is 0 ; true),
 
-    % Check if any certainties are over 75
-    ((DiarrheaCertainty >= 75) -> assert(diagnosis(P, "Diarrhea", DiarrheaCertainty)) ; true), !,
-    ((CholeraCertainty >= 75) -> assert(diagnosis(P, "Cholera", CholeraCertainty)) ; true), !.
+    % Check if any certainties are over 75, if not emergency
+    (not(emergency(P)) -> (
+        ((DiarrheaCertainty >= 75) -> assert(diagnosis(P, "Diarrhea", DiarrheaCertainty)) ; true), !,
+        ((CholeraCertainty >= 75) -> assert(diagnosis(P, "Cholera", CholeraCertainty)) ; true), !
+    ); true), !,
+
+    % If emergency, store diagnosis anyway
+    ((emergency(P) -> (
+        assert(diagnosis(P, "Diarrhea", DiarrheaCertainty)),
+        assert(diagnosis(P, "Cholera", CholeraCertainty))
+    )); true), !.
 
 /* Questions for Lifestyle Diseases */
 lifestyleQuestionnaire(P) :-
@@ -346,9 +372,17 @@ lifestyleQuestionnaire(P) :-
     % Get Diabetes Certainty
     (diabetes(P, DiabetesCertainty) ; true),
 
-    % Check for any symptoms above 75%
-    ((HypertensionCertainty >= 75) -> assert(diagnosed(P)), assert(diagnosis(P, "Hypertension", HypertensionCertainty)) ; true),
-    ((DiabetesCertainty >= 75) -> assert(diagnosed(P)), assert(diagnosis(P, "Diabetes", DiabetesCertainty)) ; true).
+    % Check if any certainties are over 75, if not emergency
+    (not(emergency(P)) -> (
+        ((HypertensionCertainty >= 75) -> assert(diagnosis(P, "Hypertension", HypertensionCertainty)) ; true), !,
+        ((DiabetesCertainty >= 75) -> assert(diagnosis(P, "Diabetes", DiabetesCertainty)) ; true), !
+    ); true), !,
+
+    % If emergency, store diagnosis anyway
+    ((emergency(P) -> (
+        assert(diagnosis(P, "Hypertension", HypertensionCertainty)),
+        assert(diagnosis(P, "Diabetes", DiabetesCertainty))
+    )); true), !.
 
 /* Get the Patient's Diagnosis Summary */
 diagnosedSummary(P) :-
@@ -356,18 +390,20 @@ diagnosedSummary(P) :-
     %  EMERGENCY
     (emergency(P) -> (
 
-        write("Emergency\n")
+        write("Emergency\n"),
+        % Display all the listed Diagnosis
+        write_ln("Here are our findings (with corresponding certainty level):"), (getDiagnosis(P) ; true), !
 
     ) ; true),
 
     % NON-EMERGENCY
     (not(emergency(P)) -> (
 
+        % Check if there is a valid diagnosis
+        ((not(diagnosis(P, _, _)) -> write_ln("This system cannot provide a diagnosis. Please visit a higher health institution.")); true), !,
+
         % Display all the listed diagnosis
-
-        write_ln("Here are our findings:"),
-
-        (getDiagnosis(P); true), !,
+        ((diagnosis(P, _, _) -> (write_ln("Here are our findings (with corresponding certainty level):"), (getDiagnosis(P) ; true), !)) ; true), !
 
     ) ; true).
 

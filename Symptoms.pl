@@ -27,8 +27,6 @@
 :- dynamic cold/1.
 :- dynamic rash/1.
 :- dynamic chills/1.
-:- dynamic feelingCold/1.
-:- dynamic feelsWeak/1.
 :- dynamic vomiting/1.
 :- dynamic nausea/1.
 :- dynamic chestPain/1.
@@ -36,10 +34,8 @@
 :- dynamic phlegm/1.
 :- dynamic shortnessBreath/1.
 :- dynamic blurryVision/1. 
-:- dynamic cramps/1.
 :- dynamic looseStools/1.
 :- dynamic abdominalPain/1.
-:- dynamic noHydration/1.
 :- dynamic increasedUrine/1.
 :- dynamic increasedThirst/1.
 :- dynamic weightLoss/1.
@@ -64,10 +60,6 @@ highBP(P) :-
 highTemp(P) :-
     temperature(P, Temp),
     (Temp >= 37.5).
-
-lowTemp(P) :-
-    temperature(P, Temp),
-    (Temp < 35).
 
 mildTemperature(P) :-
     temperature(P, Temp),

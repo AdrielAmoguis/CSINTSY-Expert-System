@@ -254,7 +254,7 @@ respiratoryQuestionnaire(P) :-
     ((Wheeze = 'Y' ; Wheeze = 'y') -> assert(wheezing(P)) ; true),
 
     % Get Bronchitis Certainty
-    (wheezing(P) -> (bronchitis(P, BronchitisCertainty) ; true)),
+    ((wheezing(P) -> (bronchitis(P, BronchitisCertainty)) ; true)), 
 
     % Set certainty to 0 if not wheezing
     (not(wheezing(P)) -> BronchitisCertainty is 0 ; true),
@@ -299,7 +299,7 @@ gastroQuestionnaire(P) :-
     diarrhea(P, DiarrheaCertainty),
 
     % Check for Cholera only if there is diarrhea
-    ((diarrhea(P, DCer), DCer >= 75) -> (
+    (((diarrhea(P, DCer), DCer >= 75) -> (
 
         % Check for more profuse bowel movement
         write("Is your bowel movement really severe (totally liquid)? [y / n] : "), read(AwitAwitTiyan),
@@ -312,7 +312,7 @@ gastroQuestionnaire(P) :-
         % Get cholera certainty
         cholera(P, CholeraCertainty)
 
-    ) ; true),
+    )) ; true),
 
     (not((diarrhea(P, DCCer), DCCer >= 75)) -> CholeraCertainty is 0 ; true),
 

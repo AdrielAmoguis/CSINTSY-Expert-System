@@ -390,7 +390,13 @@ diagnosedSummary(P) :-
 
         write("EMERGENCY DIAGNOSIS\n"),
         % Display all the listed Diagnosis
-        write_ln("Here are our findings (with corresponding certainty level):"), (printAllDiseases(P) ; true), !
+        getTopDiagnosis(P, [Name | [Certainty | _]]),
+        (((Certainty > 0) -> (
+
+            write_ln("\n\nYou have been diagnosed with the following:"),
+            format("~s with a certainty level of ~w%~n", [Name, Certainty])
+
+        )) ; true), !
 
     ) ; true),
 

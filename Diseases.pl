@@ -93,9 +93,9 @@ diarrhea(P, C) :-
 % Cholera
 cholera(P, C) :-
     L = [],
-    (((diarrhea(P, DC), DC >= 75)-> append([33.3333], L, L1); not(diarrhea(P, DDC), DDC >= 75) -> append([], L, L1)) ; true), !,
-    ((fasterStools(P) -> append([33.3333], L1, L2); not(fasterStools(P)) -> append([], L1, L2)) ; true), !,
-    ((fasterDehydration(P) -> append([33.3333], L2, L3); not(fasterDehydration(P)) -> append([], L2, L3)) ; true), !,
+    (((diarrhea(P, DC), DC >= 75) -> append([34], L, L1); not(diarrhea(P, DDC), DDC >= 75) -> append([], L, L1)) ; true), !,
+    ((fasterStools(P) -> append([33], L1, L2); not(fasterStools(P)) -> append([], L1, L2)) ; true), !,
+    ((fasterDehydration(P) -> append([33], L2, L3); not(fasterDehydration(P)) -> append([], L2, L3)) ; true), !,
 
     % Calculate & Return the Certainty Factor
     listSum(L3, C).

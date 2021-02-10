@@ -39,6 +39,7 @@
 :- dynamic increasedUrine/1.
 :- dynamic increasedThirst/1.
 :- dynamic weightLoss/1.
+:- dynamic dehydration/1.
 
 % Follow-Up
 :- dynamic longCough/1.

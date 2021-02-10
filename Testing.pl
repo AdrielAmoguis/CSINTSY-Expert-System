@@ -2,6 +2,8 @@
 :- dynamic chestPain/1.
 :- dynamic wheezing/1.
 
+:- dynamic diagnosis/3.
+
 % Bronchitis
 bronchitis(P, C) :-
     L = [],
@@ -17,3 +19,28 @@ listSum([], 0).
 listSum([E|L], Sum) :-
     listSum(L, S),
     Sum is S + E.
+
+testDecision :-
+    write_ln("Enter a decision [Y/N]"),
+    read(Decision),
+    (Decision = 'Y' ; Decision = 'y').
+
+% Get top diagnosis
+getTopDiagnosis(P, Disease) :-
+    listDiseases(P, DiseaseList),
+    listMax(DiseaseList, Disease), !.
+
+% Get the maximum in the disease list
+listMax([X],X) :- !, true.
+listMax([[_|C]|R], [Mn|Mc]) :- 
+    listMax(R, [Mn|Mc]), Mc >= C.
+listMax([[N|C]|R], [N|C]) :- 
+    listMax(R, [_|Mc]),
+    C > Mc.
+
+% Get the disease list
+listDiseases(P, []) :- not(diagnosis(P,_,_)), !.
+listDiseases(P, [Disease | Tail]) :-
+    retract(diagnosis(P, D, C)), !,
+    Disease = [D,C],
+    listDiseases(P, Tail), !.

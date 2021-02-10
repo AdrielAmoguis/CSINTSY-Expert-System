@@ -10,9 +10,7 @@
 
 % Special Dynamic Facts
 :- dynamic emergency/1.
-:- dynamic immunoCompromised/1.
 :- dynamic diagnosis/3.
-:- dynamic diagnosed/1.
 
 /* MAIN SESSION HANDLER */
 diagnose(PatientName) :-
@@ -67,10 +65,6 @@ getHPI(P) :-
     % Systolic Blood Pressure
     write("Please enter your systolic blood pressure (in mmHg) : "), read(SysBP),
     assert(bloodPressure(P, DiasBP, SysBP)),
-
-    % ImmunoCompromised
-    write("Are you immunocompromised? [Y/N] : "), read(Compromised),
-    ((Compromised = 'y' ; Compromised = 'Y') -> assert(immunoCompromised(P)) ; true),
 
     % Height
     write("Please enter your height (in centimeters) : "), read(Height),
@@ -316,7 +310,7 @@ gastroQuestionnaire(P) :-
 
     ) ; true),
 
-    (not(diarrhea(P, DCCer), DCCer >= 75) -> CholeraCertainty is 0 ; true),
+    (not((diarrhea(P, DCCer), DCCer >= 75)) -> CholeraCertainty is 0 ; true),
 
     % Check if any certainties are over 75, if not emergency
     (not(emergency(P)) -> (
@@ -402,8 +396,16 @@ diagnosedSummary(P) :-
         % Check if there is a valid diagnosis
         ((not(diagnosis(P, _, _)) -> write_ln("This system cannot provide a diagnosis. Please visit a higher health institution.")); true), !,
 
-        % Display all the listed diagnosis
-        ((diagnosis(P, _, _) -> (write_ln("Here are our findings (with corresponding certainty level):"), (getDiagnosis(P) ; true), !)) ; true), !
+        % Display only the top diagnosis
+        ((diagnosis(P, _, _) -> (
+
+            % Get the top
+            getTopDiagnosis(P, [Name | [Certainty | _]]),
+
+            write_ln("You have been diagnosed with the following:"),
+            format("~s with a certainty level of ~w%~n", [Name, Certainty])
+
+        )) ; true), !
 
     ) ; true).
 
@@ -414,3 +416,23 @@ getDiagnosis(P) :-
     retract(diagnosis(P, D, C)),
     format("| ~w~20t | ~w~20t |~n", [D,C]),
     getDiagnosis(P).
+
+% Get top diagnosis
+getTopDiagnosis(P, Disease) :-
+    listDiseases(P, DiseaseList),
+    listMax(DiseaseList, Disease), !.
+
+% Get the maximum in the disease list
+listMax([X],X) :- !, true.
+listMax([[_|C]|R], [Mn|Mc]) :- 
+    listMax(R, [Mn|Mc]), Mc >= C.
+listMax([[N|C]|R], [N|C]) :- 
+    listMax(R, [_|Mc]),
+    C > Mc.
+
+% Get the disease list
+listDiseases(P, []) :- not(diagnosis(P,_,_)), !.
+listDiseases(P, [Disease | Tail]) :-
+    retract(diagnosis(P, D, C)), !,
+    Disease = [D,C],
+    listDiseases(P, Tail), !.

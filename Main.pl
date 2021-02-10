@@ -27,7 +27,7 @@ diagnose(PatientName) :-
     write_ln("We will be asking you a series of questions regarding your symptoms to establish an idea of possible illnesses.\n"),
 
     % Get User Consent
-    write("Would you like to proceed? [Y/N]: "), read(Consent),
+    write("Would you like to proceed? [y / n]: "), read(Consent),
     (Consent = 'Y' ; Consent = 'y'),
     nl, nl, nl,
 
@@ -35,7 +35,7 @@ diagnose(PatientName) :-
     write_ln("\nWe will now begin with the questionnaire.\n"),
 
     % Get User Consent
-    write("Would you like to proceed? [Y/N]: "), read(Consent),
+    write("Would you like to proceed? [y / n]: "), read(Consent),
     (Consent = 'Y' ; Consent = 'y'),
     nl, nl, nl,
 
@@ -52,7 +52,7 @@ diagnose(PatientName) :-
 getHPI(P) :-
 
     % Ask first if emergency
-    write("ARE YOU IN AN EMERGENCY? [Y/N] : "), read(EMERG),
+    write("ARE YOU IN AN EMERGENCY? [y / n] : "), read(EMERG),
     ((EMERG = 'y' ; EMERG = 'Y') -> assert(emergency(P)) ; true),
 
     % Temperature
@@ -93,19 +93,19 @@ chiefComplaint(P) :-
     (viralQuestionnaire(P) ; true), !,
 
     % Check if the patient is already diagnosed
-    not(diagnosis(P, _, _)),
+    (not(diagnosis(P, _, _)) ; emergency(P)),
 
     % RESPIRATORY
     (respiratoryQuestionnaire(P) ; true), !,
 
     % Check if the patient is already diagnosed
-    not(diagnosis(P, _, _)),
+    (not(diagnosis(P, _, _)) ; emergency(P)),
 
     % GASTRO
     (gastroQuestionnaire(P) ; true), !,
 
     % Check if the patient is already diagnosed
-    not(diagnosis(P, _, _)),
+    (not(diagnosis(P, _, _)) ; emergency(P)),
 
     % LIFESTYLE
     lifestyleQuestionnaire(P), !.
@@ -118,32 +118,32 @@ viralQuestionnaire(P) :-
     fever(P),
 
     % Body Malaise
-    write("Do you feel an overall weakness in your whole body? [Y/N] : "), read(BM),
+    write("Do you feel an overall weakness in your whole body? [y / n] : "), read(BM),
     ((BM = 'y' ; BM = 'Y') -> assert(malaise(P)) ; true),
 
     % Runny Nose / Colds
-    write("Do you have a runny nose? [Y/N] : "), read(RN),
+    write("Do you have a runny nose? [y / n] : "), read(RN),
     ((RN = 'y' ; RN = 'Y') -> assert(runnyNose(P)) ; true),
 
-    write("Do you have colds? [Y/N] : "), read(Lamig),
+    write("Do you have colds? [y / n] : "), read(Lamig),
     ((Lamig = 'y' ; Lamig = 'Y') -> assert(cold(P)) ; true),
 
     % Test for Malaria (if there is body malaise)
     (malaise(P) -> (
 
-        write("Do you feel chills (especially at night)? [Y/N] : "), read(Chills),
+        write("Do you feel chills (especially at night)? [y / n] : "), read(Chills),
         ((Chills = 'Y' ; Chills = 'y') -> assert(chills(P)) ; true),
 
-        write("Are you having frequent headaches? [Y/N] : "), read(HA),
+        write("Are you having frequent headaches? [y / n] : "), read(HA),
         ((HA = 'Y' ; HA = 'y') -> assert(headache(P)) ; true),
 
-        write("Are you having nausea? [Y/N] : "), read(NA),
+        write("Are you having nausea? [y / n] : "), read(NA),
         ((NA = 'Y' ; NA = 'y') -> assert(nausea(P)) ; true),
 
-        write("Are you vomiting often? [Y/N] : "), read(Vomit),
+        write("Are you vomiting often? [y / n] : "), read(Vomit),
         ((Vomit = 'Y' ; Vomit = 'y') -> assert(vomiting(P)) ; true),
 
-        write("Have you been in a forest, jungle, fields, or bitten by a mosquito? [Y/N] : "), read(RiskArea),
+        write("Have you been in a forest, jungle, fields, or bitten by a mosquito? [y / n] : "), read(RiskArea),
         ((RiskArea = 'Y' ; RiskArea = 'y') -> assert(malariaRiskArea(P)) ; true),
 
         % Get Malaria Certainty
@@ -154,10 +154,10 @@ viralQuestionnaire(P) :-
     % Test for Dengue (if there is body malaise)
     (malaise(P) -> (
 
-        (not(headache(P)) -> (write("Are you having frequent headaches? [Y/N] : "), read(HAA),
+        (not(headache(P)) -> (write("Are you having frequent headaches? [y / n] : "), read(HAA),
         ((HAA = 'Y' ; HAA = 'y') -> assert(headache(P)) ; true)); true),
 
-        write("Are you having rashes? [Y/N] : "), read(Rash),
+        write("Are you having rashes? [y / n] : "), read(Rash),
         ((Rash = 'Y' ; Rash = 'y') -> assert(rash(P)) ; true),
 
         % Get Dengue Certainty
@@ -171,7 +171,7 @@ viralQuestionnaire(P) :-
     % Test for Flu (if there is colds/runnynose)
     (runnyNose(P) -> (
 
-        (not(cough(P)) -> (write("Are you having cough? [Y/N] : "), read(Cough),
+        (not(cough(P)) -> (write("Are you having cough? [y / n] : "), read(Cough),
         ((Cough = 'Y' ; Cough = 'y') -> assert(cough(P))) ; true); true),
 
         % Get Flu Certainty
@@ -202,25 +202,29 @@ respiratoryQuestionnaire(P) :-
     % Patient must have chest pain and Coughing
 
     % Chest Pain
-    write("Are you having chest pain? [Y/N] : "), read(CP),
+    write("Are you having chest pain? [y / n] : "), read(CP),
     ((CP = 'y' ; CP = 'Y') -> assert(chestPain(P)) ; true),
 
     % Coughing
     (not(cough(P)) -> (
-        write("Have you been coughing? [Y/N] : "), read(Ubo),
+        write("Have you been coughing? [y / n] : "), read(Ubo),
         ((Ubo = 'y' ; Ubo = 'Y') -> assert(cough(P)) ; true)
     ) ; true),
 
     % Check if the patient has chest pain and is coughing
     chestPain(P), cough(P),
 
+    % Check for phlegm
+    write("Are you coughing with phlegm? [y / n] : "), read(Dura),
+    ((Dura = 'y' ; Dura = 'Y') -> assert(phlegm(P)) ; true),
+
     % Check for Tuberculosis if coughing for more than 2 weeks
-    write("Have you been coughing for 2 weeks or more? [Y/N] : "), read(MahabangUbo),
+    write("Have you been coughing for 2 weeks or more? [y / n] : "), read(MahabangUbo),
     ((MahabangUbo = 'y' ; MahabangUbo = 'Y') -> assert(longCough(P)) ; true),
 
     (longCough(P) -> (
 
-        write("Do you cough up blood? [Y/N] : "), read(UboDugo),
+        write("Do you cough up blood? [y / n] : "), read(UboDugo),
         ((UboDugo = 'Y' ; UboDugo = 'y') -> assert(bloodCough(P)) ; true),
 
         % Get TB Certainty
@@ -234,7 +238,7 @@ respiratoryQuestionnaire(P) :-
     % Check for Pneumonia if feverish
     (fever(P) -> (
 
-        write("Are you having shortness of breath? [Y/N] : "), read(ShortBreath),
+        write("Are you having shortness of breath? [y / n] : "), read(ShortBreath),
         ((ShortBreath = 'Y' ; ShortBreath = 'y') -> assert(shortnessBreath(P)) ; true),
 
         % Get Dengue Certainty
@@ -246,7 +250,7 @@ respiratoryQuestionnaire(P) :-
     (not(fever(P)) -> PneuCertainty is 0 ; true),
 
     % Check for Bronchitis if Wheezing
-    write("Are you wheezing? [Y/N] : "), read(Wheeze),
+    write("Are you wheezing? [y / n] : "), read(Wheeze),
     ((Wheeze = 'Y' ; Wheeze = 'y') -> assert(wheezing(P)) ; true),
 
     % Get Bronchitis Certainty
@@ -264,7 +268,7 @@ respiratoryQuestionnaire(P) :-
 
     % If emergency, store diagnosis anyway
     ((emergency(P) -> (
-        assert(diagnosis(P, "Flu", TBCertainty)),
+        assert(diagnosis(P, "Tuberculosis", TBCertainty)),
         assert(diagnosis(P, "Pneumonia", PneuCertainty)),
         assert(diagnosis(P, "Bronchitis", BronchitisCertainty))
     )); true), !.
@@ -275,7 +279,7 @@ gastroQuestionnaire(P) :-
     % Check if the patient has loose bowel movement
 
     % LBM
-    write("Are you having loose bowel movement? [Y/N] : "), read(LBM),
+    write("Are you having loose bowel movement? [y / n] : "), read(LBM),
     ((LBM = 'y' ; LBM = 'Y') -> assert(looseStools(P)) ; true),
 
     % Must have looseStools
@@ -284,11 +288,11 @@ gastroQuestionnaire(P) :-
     % Check for diarrhea
     
     % Check for Abdominal Pain
-    write("Are you experiencing abdominal pain? [Y/N] : "), read(AwitTiyan),
+    write("Are you experiencing abdominal pain? [y / n] : "), read(AwitTiyan),
     ((AwitTiyan = 'y' ; AwitTiyan = 'Y') -> assert(abdominalPain(P)) ; true),
 
     % Check for Dehydration
-    write("Are you dehydrated? [Y/N] : "), read(Dehyd),
+    write("Are you dehydrated? [y / n] : "), read(Dehyd),
     ((Dehyd = 'y' ; Dehyd = 'Y') -> assert(dehydration(P)) ; true),
 
     % Get Diarrhea Certainty
@@ -298,11 +302,11 @@ gastroQuestionnaire(P) :-
     ((diarrhea(P, DCer), DCer >= 75) -> (
 
         % Check for more profuse bowel movement
-        write("Is your bowel movement really severe (totally liquid)? [Y/N] : "), read(AwitAwitTiyan),
+        write("Is your bowel movement really severe (totally liquid)? [y / n] : "), read(AwitAwitTiyan),
         ((AwitAwitTiyan = 'y' ; AwitAwitTiyan = 'Y') -> assert(fasterStools(P)) ; true),
 
         % Check for more profuse dehydration
-        write("Is your dehydration severe? [Y/N] : "), read(AwitDehydration),
+        write("Is your dehydration severe? [y / n] : "), read(AwitDehydration),
         ((AwitDehydration = 'y' ; AwitDehydration = 'Y') -> assert(fasterDehydration(P)) ; true),
 
         % Get cholera certainty
@@ -331,11 +335,11 @@ lifestyleQuestionnaire(P) :-
     (highBP(P) -> (
 
         % Check for Headache
-        write("Are you experiencing headaches? [Y/N] : "), read(SakitUlo),
+        write("Are you experiencing headaches? [y / n] : "), read(SakitUlo),
         ((SakitUlo = 'y' ; SakitUlo = 'Y') -> assert(headache(P)) ; true),
 
         % Vision Changes
-        write("Are you experiencing vision changes? [Y/N] : "), read(IbaPagtingin),
+        write("Are you experiencing vision changes? [y / n] : "), read(IbaPagtingin),
         ((IbaPagtingin = 'y' ; IbaPagtingin = 'Y') -> assert(visionChanges(P)) ; true),
 
         % Get Hypertension Certainty
@@ -348,19 +352,19 @@ lifestyleQuestionnaire(P) :-
     % DIABETES - Check for all symptoms
 
     % Check for Increased Urination
-    write("Are you experiencing increased urination? [Y/N] : "), read(DamingIhi),
+    write("Are you experiencing increased urination? [y / n] : "), read(DamingIhi),
     ((DamingIhi = 'y' ; DamingIhi = 'Y') -> assert(increasedUrine(P)) ; true),
 
     % Check for Increased Thirst
-    write("Are you experiencing increased thirst? [Y/N] : "), read(Uhaw),
+    write("Are you experiencing increased thirst? [y / n] : "), read(Uhaw),
     ((Uhaw = 'y' ; Uhaw = 'Y') -> assert(increasedThirst(P)) ; true),
 
     % Check for Weight Loss
-    write("Have you been losing weight lately? [Y/N] : "), read(GettingLighter),
+    write("Have you been losing weight lately? [y / n] : "), read(GettingLighter),
     ((GettingLighter = 'y' ; GettingLighter = 'Y') -> assert(weightLoss(P)) ; true),
 
     % Check for Family History
-    write("Do you have family history of Diabetes? [Y/N] : "), read(FamHistoryDiabetes),
+    write("Do you have family history of Diabetes? [y / n] : "), read(FamHistoryDiabetes),
     ((FamHistoryDiabetes = 'y' ; FamHistoryDiabetes = 'Y') -> assert(diabetesFamily(P)) ; true),
 
     % Get Diabetes Certainty
@@ -384,9 +388,9 @@ diagnosedSummary(P) :-
     %  EMERGENCY
     (emergency(P) -> (
 
-        write("Emergency\n"),
+        write("EMERGENCY DIAGNOSIS\n"),
         % Display all the listed Diagnosis
-        write_ln("Here are our findings (with corresponding certainty level):"), (getDiagnosis(P) ; true), !
+        write_ln("Here are our findings (with corresponding certainty level):"), (printAllDiseases(P) ; true), !
 
     ) ; true),
 
@@ -402,7 +406,7 @@ diagnosedSummary(P) :-
             % Get the top
             getTopDiagnosis(P, [Name | [Certainty | _]]),
 
-            write_ln("You have been diagnosed with the following:"),
+            write_ln("\n\nYou have been diagnosed with the following:"),
             format("~s with a certainty level of ~w%~n", [Name, Certainty])
 
         )) ; true), !
@@ -412,10 +416,9 @@ diagnosedSummary(P) :-
 /* UTILITY PREDICATES */
 
 % Print Diagnosis
-getDiagnosis(P) :- 
-    retract(diagnosis(P, D, C)),
-    format("| ~w~20t | ~w~20t |~n", [D,C]),
-    getDiagnosis(P).
+printAllDiseases(P) :-
+    listDiseases(P, DiseaseList),
+    printList(DiseaseList).
 
 % Get top diagnosis
 getTopDiagnosis(P, Disease) :-
@@ -436,3 +439,9 @@ listDiseases(P, [Disease | Tail]) :-
     retract(diagnosis(P, D, C)), !,
     Disease = [D,C],
     listDiseases(P, Tail), !.
+
+% Print a List
+printList([]).
+printList([[N | [C | _]] | T]) :-
+    format("~s with a certainty of ~w%~n", [N,C]),
+    printList(T).

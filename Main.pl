@@ -340,7 +340,7 @@ lifestyleQuestionnaire(P) :-
 
         % Vision Changes
         write("Are you experiencing vision changes? [y / n] : "), read(IbaPagtingin),
-        ((IbaPagtingin = 'y' ; IbaPagtingin = 'Y') -> assert(visionChanges(P)) ; true),
+        ((IbaPagtingin = 'y' ; IbaPagtingin = 'Y') -> assert(blurryVision(P)) ; true),
 
         % Get Hypertension Certainty
         hypertension(P, HypertensionCertainty)
